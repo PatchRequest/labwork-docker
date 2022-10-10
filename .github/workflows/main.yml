@@ -1,0 +1,23 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "master" branch
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  reusable-pipeline:
+    uses: arne-kapell/kauma-pipeline/.github/workflows/pipeline.yml@main
+    with:
+      TEST_SERVER: 'https://dhbw.johannes-bauer.com/lwsub/' # optional (default: https://dhbw.johannes-bauer.com/lwsub/)
+      DEFAULT_ASSIGNMENT: 'labwork01' # optional (default: labwork01)
+    secrets:
+      CLIENT_ID: ${{ secrets.CLIENT_ID }} # required (can be set in your repository settings)
