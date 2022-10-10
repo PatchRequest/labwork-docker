@@ -5,6 +5,8 @@
 import sys
 import json
 import requests
+from labwork01 import handle_histogram,handle_caesar_cipher
+
 
 if len(sys.argv) != 4:
 	print("syntax: %s [API endpoint URI] [client ID] [assignment_name]" % (sys.argv[0]))
@@ -22,7 +24,7 @@ def handle_strcat(assignment):
 def handle_foobar(assignment):
 	return { "foo": "bar" }
  
- 
+
 session = requests.Session()
 # Get the assignment
 result = session.get(api_endpoint + "/assignment/" + client_id + "/" + assignment_name)
@@ -40,6 +42,12 @@ for testcase in assignment["testcases"]:
 	elif testcase["type"] == "foobar":
 		known_assignment_count += 1
 		response = handle_foobar(testcase["assignment"])
+	elif testcase["type"] == "histogram":
+		known_assignment_count += 1
+		response = handle_histogram(testcase["assignment"])
+	elif testcase["type"] == "caesar_cipher":
+		known_assignment_count += 1
+		response = handle_caesar_cipher(testcase["assignment"])
 	else:
 		unknown_assignment_count += 1
 		print("Do not know how to handle type: %s" % (testcase["type"]))
