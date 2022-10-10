@@ -6,18 +6,19 @@ def handle_password_keyspace(assignment):
     restrictions = assignment["restrictions"]
     combinations = []
     count = 0
+
     for i in itertools.product(alphabet, repeat=length):
         combinations.append(''.join(map(str, i)))
 
     for comb in combinations:
         valid= True
-        print("Testing : " + comb + " Against : " + str(restrictions)) 
         for restriction in restrictions:
-            valid = test_restriction(restriction, comb)
-
+            if not test_restriction(restriction, comb):
+                valid = False
         if valid:
             count += 1
-    return count
+
+    return {"count": count}
 
 def test_restriction(rest, comb):
     special_chars = "!@#$%^&*()_+-="

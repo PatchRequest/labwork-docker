@@ -60,6 +60,7 @@ for testcase in assignment["testcases"]:
 	result = session.post(api_endpoint + "/submission/" + testcase["tcid"], headers = {
 		"Content-Type": "application/json",
 	}, data = json.dumps(response))
+
 	assert(result.status_code == 200)
 	submission_result = result.json()
 	if submission_result["status"] == "pass":
