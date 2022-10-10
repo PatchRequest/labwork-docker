@@ -21,7 +21,8 @@ def handle_strcat(assignment):
 # Example handler for "foobar" assignment
 def handle_foobar(assignment):
 	return { "foo": "bar" }
-
+ 
+ 
 session = requests.Session()
 # Get the assignment
 result = session.get(api_endpoint + "/assignment/" + client_id + "/" + assignment_name)
