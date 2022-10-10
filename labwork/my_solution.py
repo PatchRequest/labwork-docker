@@ -65,3 +65,5 @@ for testcase in assignment["testcases"]:
 		print(submission_result)
 print("%d known assignments, %d unknown." % (known_assignment_count, unknown_assignment_count))
 print("Passed: %d. Failed: %d" % (pass_count, known_assignment_count - pass_count))
+if unknown_assignment_count == 0 and known_assignment_count - pass_count == 0:
+	print("All tests passed!")
