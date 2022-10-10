@@ -6,7 +6,7 @@ import sys
 import json
 import requests
 from labwork01 import handle_histogram,handle_caesar_cipher
-
+from labwork02 import handle_password_keyspace
 
 if len(sys.argv) != 4:
 	print("syntax: %s [API endpoint URI] [client ID] [assignment_name]" % (sys.argv[0]))
@@ -48,6 +48,9 @@ for testcase in assignment["testcases"]:
 	elif testcase["type"] == "caesar_cipher":
 		known_assignment_count += 1
 		response = handle_caesar_cipher(testcase["assignment"])
+	elif testcase["type"] == "password_keyspace":
+		known_assignment_count += 1
+		response = handle_password_keyspace(testcase["assignment"])
 	else:
 		unknown_assignment_count += 1
 		print("Do not know how to handle type: %s" % (testcase["type"]))
