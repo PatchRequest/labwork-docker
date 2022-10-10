@@ -11,6 +11,7 @@ def handle_password_keyspace(assignment):
 
     for comb in combinations:
         valid= True
+        print("Testing : " + comb + " Against : " + str(restrictions)) 
         for restriction in restrictions:
             valid = test_restriction(restriction, comb)
 
