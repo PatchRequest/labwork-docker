@@ -11,13 +11,13 @@ def handle_histogram(assignment):
 def handle_caesar_cipher(assignment):
     action = assignment["action"]
     if action == "encrypt":
-        return caesar_encrypt(assignment["text"], assignment["shift"])
+        return caesar_encrypt(assignment["plaintext"], assignment["letter_shift"])
     elif action == "decrypt":
-        return caesar_decrypt(assignment["text"], assignment["shift"])
+        return caesar_decrypt(assignment["ciphertext"], assignment["letter_shift"])
     
 
 
-    
+
 def caesar_encrypt(text, shift):
     return caesar_shift(text, shift)
 
