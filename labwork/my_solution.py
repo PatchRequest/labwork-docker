@@ -6,7 +6,7 @@ import sys
 import json
 import requests
 from labwork01 import handle_histogram,handle_caesar_cipher
-from labwork02 import handle_password_keyspace,handle_mul_gf2_128
+from labwork02 import handle_password_keyspace,handle_mul_gf2_128,handle_block_cipher
 
 if len(sys.argv) != 4:
 	print("syntax: %s [API endpoint URI] [client ID] [assignment_name]" % (sys.argv[0]))
@@ -48,13 +48,18 @@ for testcase in assignment["testcases"]:
 	elif testcase["type"] == "caesar_cipher":
 		known_assignment_count += 1
 		response = handle_caesar_cipher(testcase["assignment"])
-	elif testcase["type"] == "password_keyspace":
-		known_assignment_count += 1
-		response = handle_password_keyspace(testcase["assignment"])
+	#elif testcase["type"] == "password_keyspace":
+	#	known_assignment_count += 1
+	#	response = handle_password_keyspace(testcase["assignment"])
 
 	elif testcase["type"] == "mul_gf2_128":
 		known_assignment_count += 1
 		response = handle_mul_gf2_128(testcase["assignment"])
+
+	elif testcase["type"] == "block_cipher":
+		known_assignment_count += 1
+		response = handle_block_cipher(testcase["assignment"])
+
 	else:
 		unknown_assignment_count += 1
 		print("Do not know how to handle type: %s" % (testcase["type"]))
@@ -65,6 +70,8 @@ for testcase in assignment["testcases"]:
 		"Content-Type": "application/json",
 	}, data = json.dumps(response))
 
+	
+	print(result.text)
 	assert(result.status_code == 200)
 	submission_result = result.json()
 	if submission_result["status"] == "pass":
