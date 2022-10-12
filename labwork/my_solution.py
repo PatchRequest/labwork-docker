@@ -48,9 +48,9 @@ for testcase in assignment["testcases"]:
 	elif testcase["type"] == "caesar_cipher":
 		known_assignment_count += 1
 		response = handle_caesar_cipher(testcase["assignment"])
-	#elif testcase["type"] == "password_keyspace":
-	#	known_assignment_count += 1
-	#	response = handle_password_keyspace(testcase["assignment"])
+	elif testcase["type"] == "password_keyspace":
+		known_assignment_count += 1
+		response = handle_password_keyspace(testcase["assignment"])
 
 	elif testcase["type"] == "mul_gf2_128":
 		known_assignment_count += 1
@@ -71,10 +71,12 @@ for testcase in assignment["testcases"]:
 	}, data = json.dumps(response))
 
 	
-	print(result.text)
 	assert(result.status_code == 200)
+
+
 	submission_result = result.json()
 	if submission_result["status"] == "pass":
+		print("PASS: %s" % (testcase["tcid"]))
 		pass_count += 1
 	else:
 		print(submission_result)

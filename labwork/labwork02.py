@@ -78,10 +78,10 @@ def handle_ctr(assignment):
     operation = assignment["operation"]
     if operation == "encrypt":
         plaintext = base64.b64decode(assignment["plaintext"])
-        return {"ciphertext": encrypt_ctr(key, nonce, plaintext)}
+        return {"ciphertext": do_ctr(key, nonce, plaintext)}
     else:
         ciphertext = base64.b64decode(assignment["ciphertext"])
-        return {"plaintext": decrypt_ctr(key, nonce, ciphertext)}
+        return {"plaintext": do_ctr(key, nonce, ciphertext)}
 
 def handle_xex(assignment):
     key = base64.b64decode(assignment["key"])
@@ -114,10 +114,9 @@ def decrypt_cbc(iv, key,ciphertext):
     for block in blocks:
         plaintext += byte_xor(decrypt_block(key, block, "block_cipher"), currentIV)
         currentIV = block
-
     return base64.b64encode(plaintext).decode("utf-8")
 
-def encrypt_ctr(key, nonce, plaintext):
+def do_ctr(key, nonce, plaintext):
     blocks = split_into_blocks(plaintext, 16)
     ciphertext = b''
     for i, block in enumerate(blocks):
@@ -126,26 +125,10 @@ def encrypt_ctr(key, nonce, plaintext):
         ciphertext += byte_xor(block, keystream)
     return base64.b64encode(ciphertext).decode("utf-8")
 
-
-
-def decrypt_ctr(key, nonce, ciphertext):
-    blocks = split_into_blocks(ciphertext, 16)
-    plaintext = b''
-    for i, block in enumerate(blocks):
-        counter = nonce + i.to_bytes(4, "big")
-        keystream = decrypt_block(key, counter, "block_cipher")
-        plaintext += byte_xor(block, keystream)
-
-    return base64.b64encode(plaintext).decode("utf-8")
-
-
-
 def encrypt_xex(key, tweak, plaintext):
     blocks = split_into_blocks(plaintext, 16)
     key1 = key[:16]
     key2 = key[16:]
-    print(key)
-    print(key2)
     ciphertext = b''
     currentTweak = encrypt_block(key2, tweak, "block_cipher")
     for block in blocks:
@@ -163,8 +146,8 @@ def encrypt_xex(key, tweak, plaintext):
 
 def decrypt_xex(key, tweak, ciphertext):
     blocks = split_into_blocks(ciphertext, 16)
-    key1 = key[:8]
-    key2 = key[8:]
+    key1 = key[:16]
+    key2 = key[16:]
     plaintext = b''
     currentTweak = encrypt_block(key2, tweak, "block_cipher")
     for block in blocks:

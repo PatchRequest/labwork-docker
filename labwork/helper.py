@@ -26,6 +26,11 @@ def split_into_blocks(text, block_size):
 
 
 def encrypt_block(key, block,assignment_type):
+    # check if key is 16 bytes
+    if len(key) != 16:
+        print(key)
+        raise ValueError("Key must be 16 bytes long")
+
     body = {
         "operation": "encrypt",
         "key": base64.b64encode(key).decode("utf-8"),
