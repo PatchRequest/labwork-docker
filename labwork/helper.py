@@ -42,7 +42,7 @@ def contact_oracle(key, block,assignment_type,mode):
     return base64.b64decode(result["ciphertext" if mode == "encrypt" else "plaintext"])
 
 def check_padding_validity(keyname,iv, ciphertext):
-    print("Checking padding validity for key: " + keyname)
+    
     body = {
         "keyname": keyname,
         "iv": base64.b64encode(iv).decode("utf-8"),
