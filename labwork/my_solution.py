@@ -5,6 +5,7 @@
 import sys
 import json
 import requests
+from labwork03 import handle_pkcs7_padding
 from labwork01 import handle_histogram,handle_caesar_cipher
 from labwork02 import handle_password_keyspace,handle_mul_gf2_128,handle_block_cipher
 
@@ -59,7 +60,9 @@ for testcase in assignment["testcases"]:
 	elif testcase["type"] == "block_cipher":
 		known_assignment_count += 1
 		response = handle_block_cipher(testcase["assignment"])
-
+	elif testcase["type"] == "pkcs7_padding":
+		known_assignment_count += 1
+		response = handle_pkcs7_padding(testcase["assignment"])
 	else:
 		unknown_assignment_count += 1
 		print("Do not know how to handle type: %s" % (testcase["type"]))
@@ -70,7 +73,7 @@ for testcase in assignment["testcases"]:
 		"Content-Type": "application/json",
 	}, data = json.dumps(response))
 
-	
+	print("Testcase %s: %s" % (testcase["tcid"], result.text))
 	assert(result.status_code == 200)
 
 

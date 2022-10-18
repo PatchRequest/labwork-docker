@@ -40,3 +40,17 @@ def contact_oracle(key, block,assignment_type,mode):
     result = session.post(oracle_url+assignment_type, data=json.dumps(body),headers=header)
     result = result.json()
     return base64.b64decode(result["ciphertext" if mode == "encrypt" else "plaintext"])
+
+def check_padding_validity(keyname,iv, ciphertext):
+    print("Checking padding validity for key: " + keyname)
+    body = {
+        "keyname": keyname,
+        "iv": base64.b64encode(iv).decode("utf-8"),
+        "ciphertext": base64.b64encode(ciphertext).decode("utf-8")
+    }
+    header = {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    }
+    result = session.post(oracle_url+"pkcs7_padding", data=json.dumps(body),headers=header)
+    return result.json()['status'] == "padding_correct"
