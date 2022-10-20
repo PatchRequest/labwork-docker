@@ -1,9 +1,12 @@
 import requests
 import base64
 import json
+import sys
 
 
-oracle_url = "https://dhbw.johannes-bauer.com/lwsub/oracle/"
+
+api_endpoint = sys.argv[1]
+oracle_url = api_endpoint+"/oracle/"
 
 session = requests.Session()
 
