@@ -29,19 +29,15 @@ def handle_gcm_block_to_poly(assignment):
     return {"coefficients": result}
 
 def reverse_bits_in_byte(byte):
-    return int('{:08b}'.format(byte)[::-1], 2)
-
+    reverse = 0
+    for i in range(0,8):
+        if (byte & (1 << i)):
+            reverse |= 1 << (7 - i)
+    return reverse
 
 def handle_gcm_mul_gf2_128(assignment):
-    #assignment["a"] = "oe30LKZCCNHRkeQx0PAkDg=="
-    #assignment["b"] = "FawRmzU5ryA4gQfrLIQuEA=="
     a = int.from_bytes([reverse_bits_in_byte(g) for g in base64.b64decode(assignment["a"])], byteorder='little')
-    # a = 0b11000100
     b = int.from_bytes([reverse_bits_in_byte(g) for g in base64.b64decode(assignment["b"])], byteorder='little')
-    #a = int.from_bytes(base64.b64decode(assignment["a"]),"big")
-    #b = int.from_bytes(base64.b64decode(assignment["b"]),"big")
-
-    # reverse the bits in each byte
 
 
 
