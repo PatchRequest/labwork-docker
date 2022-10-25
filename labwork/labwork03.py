@@ -41,7 +41,6 @@ def brute_one_byte(kc,keyname,temp_iv,ciphertext,current_byte):
     print("Cracking byte: " + str(current_byte))
     for i in range(0, 256):
         temp_iv[current_byte] = i
-        #print("Trying: " + temp_iv.hex())
         if check_padding_validity(keyname,temp_iv,ciphertext):
 
             if current_byte == 15:

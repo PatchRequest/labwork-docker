@@ -20,27 +20,6 @@ def handle_cbc_key_equals_iv(assignment):
     c0 = byte_xor(plaintext[0:16], plaintext[32:48])
     return {"key": base64.b64encode(c0).decode("utf-8")}
 
-
-  
-
-
-
-    #Modify the second block of the ciphertext to contain only zeros
-    ciphertext = ciphertext[:16] + bytes(16) + ciphertext[32:]
-    #Modify the third block of the ciphertext to be the same as the first block
-    ciphertext = ciphertext[:32] + ciphertext[:16] + ciphertext[48:]
-    # add fourth block of valid PKCS#7 padding
-    ciphertext = ciphertext + bytes([16]*16)
-
-    #Decrypt the ciphertext and get the invalid plaintext result
-    plaintext = decrypt_with_keyname(keyname,ciphertext,"cbc_key_equals_iv")
-    #XOR the first and third blocks of the invalid plaintext
-    key = bytes([_a ^ _b for _a, _b in zip(plaintext[:16], plaintext[32:])])
-
-
-
-    return {"key": base64.b64encode(key).decode("utf-8")}
-   
  
 
 def handle_gcm_block_to_poly(assignment):

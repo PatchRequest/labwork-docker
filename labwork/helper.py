@@ -74,33 +74,21 @@ def check_padding_validity(keyname,iv, ciphertext):
 
 def gcm_mul_gf2_128(x, y):
     termLength = 128*2
-
-    #print("X: "+bin(x))
-    #print("Y: "+bin(y))
     to_xor = []
     polys = gcm_block_to_poly(y)
     polys.sort()
-    #print("Polys: "+str(polys))
     MIN_POLY =0b100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000111
     for poly in polys:
         to_xor.append(x << (127 - poly))
     
     result = 0
     for my in to_xor:
-        #print(" " * (termLength-my.bit_length())+bin(my))
 
         result = result ^ my
-    #print("Now Reduce!")
-    #print("Result: "+bin(result))
-    # reduce with a^128 = a^7 + a^2 + a + 1
     while result.bit_length() > 128:
-        #print(" " * (termLength-result.bit_length()) +bin(result))
         to_shift = result.bit_length() - MIN_POLY.bit_length()
         reducer = (MIN_POLY << to_shift)
-        #print(" " * (termLength-reducer.bit_length())+bin(reducer))
         result = result ^ reducer
-        #print()
-    #print("EndResult: "+bin(result))
     return result
 
 
