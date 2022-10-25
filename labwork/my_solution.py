@@ -82,11 +82,12 @@ for testcase in assignment["testcases"]:
 		"Content-Type": "application/json",
 	}, data = json.dumps(response))
 
-	print("Testcase %s: %s" % (testcase["tcid"], result.text))
+	submission_result = result.json()
+	print("Testcase %s: %s" % (testcase["tcid"], submission_result.get("status", "unknown")))
 	assert(result.status_code == 200)
 
 
-	submission_result = result.json()
+	
 	if submission_result["status"] == "pass":
 		
 		pass_count += 1
