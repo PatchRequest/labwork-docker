@@ -52,7 +52,6 @@ def decrypt_with_keyname(keyname,ciphertext,assignment_type):
         "Accept": "application/json"
     }
     result = session.post(oracle_url+assignment_type, data=json.dumps(body),headers=header)
-    print(result.json())
     return result.json()["plaintext"]
 
 
