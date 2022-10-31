@@ -25,52 +25,86 @@ def handle_rc4_fms(assignment,tcid):
             groups[blocks_iv[i][0]] = []
         groups[blocks_iv[i][0]].append(blocks_iv[i])
 
-    k = b'' 
-    cracked = False
-    timelinetree = {-1:[(b'',0)]}
-    current_start_level = 0
-    session = requests.Session()
-    while not cracked:
-        for i in range(current_start_level,key_length):
-            bestTryForKYet = timelinetree.get(i-1)[0][0]
-            new_variations = get_possible_k(groups.get(i+3),bestTryForKYet)
-            for variation in new_variations:
-                new_var = b'' + bestTryForKYet + variation[0].to_bytes(2, byteorder='big')[1:]
-                confidence = variation[1] 
-                if i not in timelinetree:
-                    timelinetree[i] = []
-                timelinetree[i].append((new_var,confidence))
-            #print(timelinetree)
-            #print()
-            #print()
-        current_start_level = key_length-1
-        
-        for guess in timelinetree.get(key_length-1):
-            
-            #print(base64.b64encode(guess[0]).decode("utf-8"))
-            bytes_like_object = guess[0]
-            my_object = {"key": base64.b64encode(bytes_like_object).decode("utf-8")}
-            dumped_data = json.dumps(my_object)
-            #print(type(bytes_like_object))
-            result = session.post(api_endpoint + "/submission/" + tcid, headers = {
-            "Content-Type": "application/json",
-            }, data = dumped_data)
-            print(result.text)
-            submission_result = result.json()
-            #if submission_result["status"] == "pass":
-            cracked = True
-            k = guess[0]
+    
+    levels = [[(b'',0)]]
+    
+    levels = crack_from(0,key_length,levels,groups)
+    print(len(levels))
+    final_key = True
+    start_level = 16
+    """
+    Hiermit müsste Backtracking gehen aber irgendwie läuft es ewig lange sodass es nicht in absehbarer Zeit mal fertig wird :(
+    Mit dem 2 Dimensionalen Array baue ich quasi ein Baum auf, in dem ich die möglichen Kombinationen von K0 bis Kn speichere.
+
+
+    Beispiel Output:
+    Regenerating from:  15
+    Testing with level dTIJUKzHjWAYZsjxoj3+  with confidence:  4
+    Regenerating from:  15
+    Testing with level dTIJUKzHjWAYZsjxoj21  with confidence:  4
+    Regenerating from:  15
+    Testing with level dTIJUKzHjWAYZsjxoj3S  with confidence:  4
+    Regenerating from:  15
+    Testing with level dTIJUKzHjWAYZsjxoj3D  with confidence:  4
+    Regenerating from:  15
+    Testing with level dTIJUKzHjWAYZsjxoj2d  with confidence:  3
+    Regenerating from:  15
+    Testing with level dTIJUKzHjWAYZsjxoj3k  with confidence:  3
+    Regenerating from:  15
+    Testing with level dTIJUKzHjWAYZsjxoj1m  with confidence:  3
+    Regenerating from:  15
+    Testing with level dTIJUKzHjWAYZsjxoj0s  with confidence:  3
+    Regenerating from:  15
+    Testing with level dTIJUKzHjWAYZsjxoj2j  with confidence:  3
+    Regenerating from:  15
+    Testing with level dTIJUKzHjWAYZsjxoj2/  with confidence:  3
+    [...]
+    Regenerating from:  14
+    ...
+
+    Ich denke sie verstehen es.
+
+
+    while final_key:
+        key = test_highstes_level(levels,tcid)
+        if key != None:
+            final_key = key
             break
-            #else:
-            #    timelinetree.get(key_length-1).pop(0)
-        
-        if not cracked:
-            current_start_level -= 1
-            # remove bestTryForKYet from timelinetree
-            timelinetree.get(current_start_level).pop(0)
-            #k += get_possible_k(groups.get(i+3),k)[0][0].to_bytes(2, byteorder='big')[1:]
-        
-    return {"key": base64.b64encode(k).decode("utf-8")}
+        levels.pop()
+        levels[-1].pop(0)
+        start_level = len(levels) -1
+        print("Regenerating from: ",start_level)
+        print("Testing with level",base64.b64encode(levels[-1][0][0]).decode("utf-8"), " with confidence: ",levels[-1][0][1])
+        levels = crack_from(start_level,key_length,levels,groups)7
+    """
+    key = levels[-1][0][0]
+    return {"key": base64.b64encode(key).decode("utf-8")}
+
+
+def crack_from(start,end,levels,groups):
+    for current_level in range(start,end):
+        new_post = get_possible_k(groups.get(current_level+3),levels[-1][0][0])
+        new_ones = []
+        for post in new_post:
+            new_ones.append(
+                    (
+                        levels[-1][0][0]+bytes([post[0]]),
+                        post[1]
+                    )
+                )
+        levels.append(new_ones)
+    return levels
+
+def test_highstes_level(levels,tcid):
+    session = requests.Session()
+    for combination in levels[-1]:
+        result = session.post(api_endpoint + "/submission/" + tcid, headers = {
+            "Content-Type": "application/json",
+        }, data = json.dumps({"key": base64.b64encode(combination[0]).decode("utf-8")}))
+        if result.json()["status"] == "pass":
+            return combination[0]
+    return None
+
 
 def get_possible_k(ivs,k):
     # sort iv by fourth byte
