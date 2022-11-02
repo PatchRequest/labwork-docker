@@ -33,49 +33,29 @@ def handle_rc4_fms(assignment,tcid):
     final_key = True
     start_level = 16
     """
-    Hiermit müsste Backtracking gehen aber irgendwie läuft es ewig lange sodass es nicht in absehbarer Zeit mal fertig wird :(
-    Mit dem 2 Dimensionalen Array baue ich quasi ein Baum auf, in dem ich die möglichen Kombinationen von K0 bis Kn speichere.
-
-
-    Beispiel Output:
-    Regenerating from:  15
-    Testing with level dTIJUKzHjWAYZsjxoj3+  with confidence:  4
-    Regenerating from:  15
-    Testing with level dTIJUKzHjWAYZsjxoj21  with confidence:  4
-    Regenerating from:  15
-    Testing with level dTIJUKzHjWAYZsjxoj3S  with confidence:  4
-    Regenerating from:  15
-    Testing with level dTIJUKzHjWAYZsjxoj3D  with confidence:  4
-    Regenerating from:  15
-    Testing with level dTIJUKzHjWAYZsjxoj2d  with confidence:  3
-    Regenerating from:  15
-    Testing with level dTIJUKzHjWAYZsjxoj3k  with confidence:  3
-    Regenerating from:  15
-    Testing with level dTIJUKzHjWAYZsjxoj1m  with confidence:  3
-    Regenerating from:  15
-    Testing with level dTIJUKzHjWAYZsjxoj0s  with confidence:  3
-    Regenerating from:  15
-    Testing with level dTIJUKzHjWAYZsjxoj2j  with confidence:  3
-    Regenerating from:  15
-    Testing with level dTIJUKzHjWAYZsjxoj2/  with confidence:  3
-    [...]
-    Regenerating from:  14
-    ...
-
-    Ich denke sie verstehen es.
-
-
-    while final_key:
+    Mit dem folgenden Code müsste Backtracking gehen. Irgendwie dauert es aber ewig bis er was findet.
+    An sich müsste der code aber so gehen.
+    Zum Anschauen davon können sie einfach die dreifachen Anführungszeichen unten in die Zeile unter diesem kommetar einfügen.
+    
+    
+    lowest = 15
+    while True:
         key = test_highstes_level(levels,tcid)
         if key != None:
-            final_key = key
-            break
-        levels.pop()
-        levels[-1].pop(0)
+            return {"key": base64.b64encode(key).decode("utf-8")}
+        # clear last level
+        levels[-1] = []
+        while levels[-1] == []:
+            levels = levels[:-1]
+            # remove first element of last level
+            levels[-1] = levels[-1][1:]
+            
         start_level = len(levels) -1
-        print("Regenerating from: ",start_level)
-        print("Testing with level",base64.b64encode(levels[-1][0][0]).decode("utf-8"), " with confidence: ",levels[-1][0][1])
-        levels = crack_from(start_level,key_length,levels,groups)7
+        if lowest >= start_level:
+            print("Regenerating from: ",start_level," with length: ",len(levels[start_level]))
+            lowest = start_level
+
+        levels = crack_from(start_level,key_length,levels,groups)
     """
     key = levels[-1][0][0]
     return {"key": base64.b64encode(key).decode("utf-8")}
@@ -94,14 +74,16 @@ def crack_from(start,end,levels,groups):
                 )
         levels.append(new_ones)
     return levels
-
+session = requests.Session()
 def test_highstes_level(levels,tcid):
-    session = requests.Session()
+    
     for combination in levels[-1]:
         result = session.post(api_endpoint + "/submission/" + tcid, headers = {
             "Content-Type": "application/json",
         }, data = json.dumps({"key": base64.b64encode(combination[0]).decode("utf-8")}))
         if result.json()["status"] == "pass":
+            print(result.text)
+            print("Succes with: " + base64.b64encode(combination[0]).decode("utf-8"))
             return combination[0]
     return None
 
@@ -136,7 +118,22 @@ def get_possible_k(ivs,k):
             ks[ka] += 1
 
     ks = sorted(ks.items(), key=lambda x: x[1], reverse=True)
-    return ks
+    # mean of all confidence values
+    mean = sum([x[1] for x in ks]) / len(ks)
+
+    # variance of the conficen
+    variance = 0
+    for i in range(len(ks)):
+        variance += (ks[i][1] - mean)**2
+    variance = variance / len(ks)
+    
+    # take the highest 3 and if the variance is high take 5
+    if variance > 1.6:
+        return ks[:5]
+    
+    return ks[:3]
+
+
 
 
         
