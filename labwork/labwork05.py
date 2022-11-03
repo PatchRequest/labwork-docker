@@ -10,10 +10,12 @@ assignment_name = sys.argv[3]
 
 
 def handle_rc4_fms(assignment,tcid):
+
+
+
     captured_ivs = base64.b64decode(assignment["captured_ivs"])
     key_length = int(assignment["key_length"])
     difficulty = int(assignment["difficulty"])
-
     blocks_iv = split_into_blocks(captured_ivs,4)
     # sort blocks by first byte
     blocks_iv.sort(key=lambda x: x[0])
@@ -28,37 +30,43 @@ def handle_rc4_fms(assignment,tcid):
     
     levels = [[(b'',0)]]
     
-    levels = crack_from(0,key_length,levels,groups)
-    print(len(levels))
-    final_key = True
-    start_level = 16
-    """
-    Mit dem folgenden Code müsste Backtracking gehen. Irgendwie dauert es aber ewig bis er was findet.
-    An sich müsste der code aber so gehen.
-    Zum Anschauen davon können sie einfach die dreifachen Anführungszeichen unten in die Zeile unter diesem kommetar einfügen.
-    
-    
-    lowest = 15
-    while True:
-        key = test_highstes_level(levels,tcid)
-        if key != None:
-            return {"key": base64.b64encode(key).decode("utf-8")}
-        # clear last level
-        levels[-1] = []
-        while levels[-1] == []:
-            levels = levels[:-1]
-            # remove first element of last level
-            levels[-1] = levels[-1][1:]
-            
-        start_level = len(levels) -1
-        if lowest >= start_level:
-            print("Regenerating from: ",start_level," with length: ",len(levels[start_level]))
-            lowest = start_level
 
-        levels = crack_from(start_level,key_length,levels,groups)
-    """
-    key = levels[-1][0][0]
-    return {"key": base64.b64encode(key).decode("utf-8")}
+    levels = crack_from(0,key_length,levels,groups)
+    for to_switch in range(key_length+1):
+        for j in range(0,12): # hier könnte man höherstellen wenn ich noch unwahrscheinlichere kanidaten auch testen will
+            key = b''
+            for i in range(key_length):
+                if to_switch-1 == i:
+                    key = crack_from_new(i,key,groups,j)
+                else:
+                    key = crack_from_new(i,key,groups,0)
+                
+            if test_key(key,tcid):
+                print("Succes with: " + base64.b64encode(key).decode("utf-8"))
+                return {"key": base64.b64encode(key).decode("utf-8")}   
+            else:
+                print("Failed with: ", str(to_switch) , " " , hex(int.from_bytes(key,"big")))
+
+                
+
+def crack_from_new(current_level,current_key,groups,index):
+    new_post = get_possible_k(groups.get(current_level+3),current_key)
+    # take the first in from the first tuple in the list as byte
+    
+    return current_key + bytes([new_post[index][0]])
+
+
+
+
+
+def test_key(key,tcid):
+    result = session.post(api_endpoint + "/submission/" + tcid, headers = {
+        "Content-Type": "application/json",
+    }, data = json.dumps({"key": base64.b64encode(key).decode("utf-8")}))
+    if result.json()["status"] == "pass":
+        return True
+    else:
+        return False
 
 
 def crack_from(start,end,levels,groups):
@@ -118,20 +126,7 @@ def get_possible_k(ivs,k):
             ks[ka] += 1
 
     ks = sorted(ks.items(), key=lambda x: x[1], reverse=True)
-    # mean of all confidence values
-    mean = sum([x[1] for x in ks]) / len(ks)
-
-    # variance of the conficen
-    variance = 0
-    for i in range(len(ks)):
-        variance += (ks[i][1] - mean)**2
-    variance = variance / len(ks)
-    
-    # take the highest 3 and if the variance is high take 5
-    if variance > 1.6:
-        return ks[:5]
-    
-    return ks[:3]
+    return ks
 
 
 
