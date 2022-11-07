@@ -42,10 +42,9 @@ def handle_rc4_fms(assignment,tcid):
                     key = crack_from_new(i,key,groups,0)
                 
             if test_key(key,tcid):
-                print("Succes with: " + base64.b64encode(key).decode("utf-8"))
+                #print("Succes with: " + base64.b64encode(key).decode("utf-8"))
                 return {"key": base64.b64encode(key).decode("utf-8")}   
-            else:
-                print("Failed with: ", str(to_switch) , " " , hex(int.from_bytes(key,"big")))
+
 
                 
 
@@ -83,17 +82,6 @@ def crack_from(start,end,levels,groups):
         levels.append(new_ones)
     return levels
 session = requests.Session()
-def test_highstes_level(levels,tcid):
-    
-    for combination in levels[-1]:
-        result = session.post(api_endpoint + "/submission/" + tcid, headers = {
-            "Content-Type": "application/json",
-        }, data = json.dumps({"key": base64.b64encode(combination[0]).decode("utf-8")}))
-        if result.json()["status"] == "pass":
-            print(result.text)
-            print("Succes with: " + base64.b64encode(combination[0]).decode("utf-8"))
-            return combination[0]
-    return None
 
 
 def get_possible_k(ivs,k):

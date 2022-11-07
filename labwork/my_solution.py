@@ -10,6 +10,7 @@ from labwork01 import handle_histogram,handle_caesar_cipher
 from labwork02 import handle_password_keyspace,handle_mul_gf2_128,handle_block_cipher
 from labwork04 import handle_gcm_mul_gf2_128,handle_gcm_block_to_poly,handle_cbc_key_equals_iv
 from labwork05 import handle_rc4_fms
+from labwork06 import handle_chi_square
 if len(sys.argv) != 4:
 	print("syntax: %s [API endpoint URI] [client ID] [assignment_name]" % (sys.argv[0]))
 	sys.exit(1)
@@ -74,6 +75,9 @@ for testcase in assignment["testcases"]:
 	elif testcase["type"] == "rc4_fms":
 		known_assignment_count += 1
 		response = handle_rc4_fms(testcase["assignment"],testcase["tcid"])
+	elif testcase["type"] == "chi_square":
+		known_assignment_count += 1
+		response = handle_chi_square(testcase["assignment"])
 	else:
 		unknown_assignment_count += 1
 		print("Do not know how to handle type: %s" % (testcase["type"]))
