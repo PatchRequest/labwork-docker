@@ -5,7 +5,6 @@ from helper import split_into_blocks
 def handle_chi_square(assignment):
     
     action = assignment["action"]
-    print(action)
     if action == "decimate":
         return do_decimate(assignment)
     elif action == "histogram":
