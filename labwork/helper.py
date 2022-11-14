@@ -2,11 +2,27 @@ import requests
 import base64
 import json
 import sys
+import asyncio
 
 api_endpoint = sys.argv[1]
 oracle_url = api_endpoint+"/oracle/"
 
 session = requests.Session()
+
+
+def request_oracle_with_user_pass(username,password):
+    body = {
+        "user": username,
+        "password": password
+    }
+    header = {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    }
+    result = session.post(oracle_url+"timing_sidechannel", data=json.dumps(body),headers=header)
+    my_dict = result.json()
+    my_dict['password'] = password
+    return my_dict
 
 
 def multiply_with_alpha_in_gf2_128(x):
