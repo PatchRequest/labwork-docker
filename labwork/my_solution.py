@@ -12,6 +12,7 @@ from labwork04 import handle_gcm_mul_gf2_128,handle_gcm_block_to_poly,handle_cbc
 from labwork05 import handle_rc4_fms
 from labwork06 import handle_chi_square
 from labwork07 import handle_timing_sidechannel
+from labwork08 import handle_rsa_crt_fault_injection
 if len(sys.argv) != 4:
 	print("syntax: %s [API endpoint URI] [client ID] [assignment_name]" % (sys.argv[0]))
 	sys.exit(1)
@@ -82,6 +83,9 @@ for testcase in assignment["testcases"]:
 	elif testcase["type"] == "timing_sidechannel":
 		known_assignment_count += 1
 		response = handle_timing_sidechannel(testcase["assignment"])
+	elif testcase["type"] == "rsa_crt_fault_injection":
+		known_assignment_count += 1
+		response = handle_rsa_crt_fault_injection(testcase["assignment"])
 	else:
 		unknown_assignment_count += 1
 		print("Do not know how to handle type: %s" % (testcase["type"]))
