@@ -9,6 +9,16 @@ oracle_url = api_endpoint+"/oracle/"
 
 session = requests.Session()
 
+def set_bit(self, bit):
+    self |= (1 << bit)
+    return self
+
+def bytesToInt(byte_array):
+    return int.from_bytes(byte_array, byteorder='big')
+
+def intToBytes(integer):
+    return integer.to_bytes((integer.bit_length() + 7) // 8, 'big')
+
 
 def request_oracle_with_user_pass(username,password):
     body = {
