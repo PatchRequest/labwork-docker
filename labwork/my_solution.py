@@ -14,6 +14,7 @@ from labwork06 import handle_chi_square
 from labwork07 import handle_timing_sidechannel
 from labwork08 import handle_rsa_crt_fault_injection
 from labwork09 import handle_glasskey
+from labwork10 import handle_dual_ec_dbrg
 
 if len(sys.argv) != 4:
 	print("syntax: %s [API endpoint URI] [client ID] [assignment_name]" % (sys.argv[0]))
@@ -93,6 +94,9 @@ for testcase in assignment["testcases"]:
 		known_assignment_count += 1
 		response = handle_glasskey(testcase["assignment"])
 
+	elif testcase["type"] == "dual_ec_dbrg":
+		known_assignment_count += 1
+		response = handle_dual_ec_dbrg(testcase["assignment"])
 	else:
 		unknown_assignment_count += 1
 		print("Do not know how to handle type: %s" % (testcase["type"]))
